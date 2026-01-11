@@ -148,6 +148,7 @@ This project builds upon excellent work from the security community:
 
 - **[Checkov](https://github.com/bridgecrewio/checkov)** - Comprehensive IaC security rules
 - **[tfsec](https://github.com/aquasecurity/tfsec)** - Terraform security best practices
+- **[sbomplay](https://github.com/cyfinoid/sbomplay)** - Github repo scanning functionality
 
 We didn't reinvent the wheel - this is a browser-based implementation created using lovable.dev and chatgpt to make IaC scanning accessible without CLI installations.
 
