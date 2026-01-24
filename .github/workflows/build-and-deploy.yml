@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -42,8 +40,8 @@ jobs:
             echo "Error: Build failed - index.html not found in docs folder"
             exit 1
           fi
-          echo "Build successful!"
-          echo "File size:"
+          echo "✅ Build successful!"
+          echo "📦 File size:"
           ls -lh docs/index.html
       
       - name: Commit and push build artifacts
