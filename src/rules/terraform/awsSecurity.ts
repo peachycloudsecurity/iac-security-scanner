@@ -81,12 +81,21 @@ function checkSecurityGroupIngress(
         });
       }
     }
-  } else if (Array.isArray(ingress)) {
-    for (const rule of ingress) {
+  } else {
+    // Handle ingress as nested block(s) - can be object or array of objects
+    const ingressRules: unknown[] = [];
+    if (Array.isArray(ingress)) {
+      ingressRules.push(...ingress);
+    } else if (ingress && typeof ingress === 'object') {
+      ingressRules.push(ingress);
+    }
+    
+    for (const rule of ingressRules) {
       if (typeof rule === 'object' && rule !== null) {
-        const fromPort = (rule as Record<string, unknown>).from_port;
-        const toPort = (rule as Record<string, unknown>).to_port;
-        const cidrBlocks = (rule as Record<string, unknown>).cidr_blocks || (rule as Record<string, unknown>).cidr_ipv4;
+        const ruleObj = rule as Record<string, unknown>;
+        const fromPort = ruleObj.from_port;
+        const toPort = ruleObj.to_port;
+        const cidrBlocks = ruleObj.cidr_blocks || ruleObj.cidr_ipv4;
         
         if (checkPort(fromPort, toPort, cidrBlocks)) {
           findings.push({

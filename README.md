@@ -1,199 +1,140 @@
 # IaC Security Scanner
 
-## About
-
-A client-side Infrastructure as Code security scanner that analyzes Terraform, Kubernetes, Docker, and CloudFormation configurations directly in your browser. Built for security professionals, DevSecOps engineers, and cloud architects to identify security misconfigurations and compliance violations in real-time.
-
-The tool features comprehensive IaC analysis including 200+ security rules, GitHub repository scanning, PDF reporting, and detailed remediation guidance. All analysis happens directly in your browser - no data ever leaves your machine.
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-IaC%20Scanner-blue?style=for-the-badge&logo=github)](https://peachycloudsecurity.com/apps/scanner)
+Browser-based Infrastructure as Code security scanner. Analyzes Terraform, Kubernetes, Docker, and CloudFormation files directly in your browser. No server, no uploads, everything runs client-side.
 
 ## Features
 
-- **Multi-Format Support**: Terraform, Kubernetes, Docker, CloudFormation
-- **200+ Security Rules**: Comprehensive coverage of common misconfigurations
-- **GitHub Integration**: Scan entire repositories with rate limiting and progress tracking
-- **Client-Side Processing**: Everything runs in your browser, no data uploads
-- **PDF Export**: Professional scan reports with detailed findings and remediation steps
-- **Real-Time Analysis**: Instant feedback as you paste or upload files
-- **Example Library**: Built-in examples to test scanner capabilities
-- **Privacy-First**: No accounts, no tracking, no data collection
+- 2448 security rules covering common misconfigurations
+- Supports Terraform, Kubernetes, Docker, CloudFormation
+- GitHub repository scanning with rate limit handling
+- PDF report export
+- Single file HTML output for easy deployment
 
 ## Quick Start
 
-1. **Development Setup**:
-   ```bash
-   npm install
-   npm run dev
-   ```
+### Prerequisites
 
-2. **Open in Browser**: Navigate to `http://localhost:8080`
+Node.js 18+ and npm
 
-3. **Start Scanning**:
-   - **Upload File**: Drag and drop your IaC files
-   - **Paste Code**: Copy-paste configuration directly
-   - **GitHub Repository**: Enter a public GitHub repo URL
-   - **Examples**: Try built-in vulnerable examples
+### Installation
 
-4. **Review Results**: Get detailed findings with severity ratings and remediation steps
+```bash
+git clone https://github.com/yourusername/iac-security-scanner.git
+cd iac-security-scanner
+npm install
+```
 
-5. **Export Report**: Download comprehensive PDF reports
+### Development
+
+```bash
+npm run dev
+```
+
+Opens at `http://localhost:5173`
+
+### Build
+
+```bash
+npm run build
+```
+
+Builds a single `index.html` file in the `docs/` folder. Open `docs/index.html` in your browser to use the scanner.
+
+The build bundles all CSS and JavaScript inline into one HTML file using vite-plugin-singlefile.
+
+### Deployment
+
+Upload `docs/index.html` to any static hosting service. Works with GitHub Pages, Netlify, Vercel, or any web server.
+
+For GitHub Pages, enable Pages in repository settings and point to the `docs` folder. The included GitHub Actions workflow automatically builds on push to main branch.
+
+## Usage
+
+1. Upload a file or paste code
+2. Enter a GitHub repository URL to scan entire repos
+3. Review findings with severity ratings
+4. Export PDF reports
 
 ## Supported File Types
 
-- **Terraform**: `.tf`, `.tfvars`, `.hcl`
-- **Kubernetes**: `.yaml`, `.yml` manifests
-- **Docker**: `Dockerfile`, `docker-compose.yml`
-- **CloudFormation**: `.template`, `.json`, `.yaml`, `.yml`
+- Terraform: `.tf`, `.tfvars`, `.hcl`
+- Kubernetes: `.yaml`, `.yml`
+- Docker: `Dockerfile`, `docker-compose.yml`
+- CloudFormation: `.template`, `.json`, `.yaml`, `.yml`
 
 ## GitHub Repository Scanning
 
-Scan entire GitHub repositories for IaC security issues:
+Scan public GitHub repositories by entering the repository URL. The scanner handles rate limiting automatically with 200ms delays between requests. Unauthenticated GitHub API limit is 60 requests per hour.
 
-- **Public Repositories**: Enter any `https://github.com/owner/repo` URL
-- **Rate Limiting**: Automatic handling with smart retry logic
-- **Progress Tracking**: Real-time progress with file-by-file status
-- **Bulk Analysis**: Scan hundreds of files with aggregated results
-- **Export Support**: Download comprehensive multi-file reports
+## Project Structure
 
-### Rate Limits & Best Practices
+```
+src/
+├── components/     # React components
+├── rules/          # 2448 security rules by IaC type
+├── parsers/        # File parsers for each format
+├── engine/         # Core scanning logic
+└── utils/          # GitHub client, PDF export, etc.
+```
 
-- **GitHub API**: 60 requests/hour (unauthenticated)
-- **Smart Delays**: Built-in 200ms delays between requests
-- **Error Handling**: Distinguishes between rate limits and access denied
-- **Progress Updates**: Clear status messages and wait times
+## Build Scripts
+
+- `npm run dev` - Development server
+- `npm run build` - Production build to `docs/` folder
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint
 
 ## Technical Details
 
-- **Client-Side**: Pure JavaScript, no server required
-- **Security Rules**: Based on Checkov and tfsec implementations
-- **File Detection**: Automatic IaC format detection
-- **Parsing**: Custom parsers for each IaC format
-- **Export**: PDF generation with jsPDF
-- **Storage**: Browser localStorage for settings
-
-## Browser Compatibility
-
-- Modern browsers with ES6+ support
-- Requires File API for drag-and-drop uploads
-- LocalStorage for configuration persistence
-- No external dependencies beyond CDN resources
-
-## Development & Deployment
-
-### Production Build
-```bash
-npm run build
-npm run preview
-```
-
-### Project Structure
-```
-browser-iac-scanner/
-├── index.html              # Main application
-├── src/
-│   ├── components/         # React components
-│   │   └── scanner/        # Scanner-specific components
-│   ├── rules/             # Security rules by IaC type
-│   │   ├── terraform/     # Terraform security rules
-│   │   ├── kubernetes/    # Kubernetes security rules
-│   │   ├── dockerfile/    # Docker security rules
-│   │   └── cloudformation/ # CloudFormation rules
-│   ├── parsers/           # IaC file parsers
-│   ├── utils/             # Utility functions
-│   └── types/             # TypeScript definitions
-├── public/                # Static assets
-└── package.json           # Dependencies and scripts
-```
+- Client-side only, no server required
+- Single file HTML output for production
+- Security rules based on Checkov and tfsec
+- Custom parsers for each IaC format
+- PDF generation with jsPDF
 
 ## Troubleshooting
 
-### Common Issues
+**No findings detected**: Check file format is supported and syntax is valid.
 
-**No Issues Found**
-- Ensure file format is supported
-- Check file syntax and structure
-- Some rules may not apply to your specific configuration
+**GitHub scanning errors**: Rate limit (403) or private repository (404). Wait a few minutes and retry.
 
-**GitHub Scanning Errors**
-- **403 Forbidden**: Rate limit hit or private repository
-- **404 Not Found**: Repository doesn't exist or is private
-- **Connection Errors**: Check internet connection
-
-**Performance Issues**
-- Large files (>1MB) may take longer to process
-- GitHub repositories with 100+ files require patience
-- Clear browser cache if experiencing slowdowns
-
-## 💬 Community & Learning
-
-### YouTube Channel
-Learn cloud security with hands-on tutorials and walkthroughs:
-
-**[Subscribe to @peachycloudsecurity](https://www.youtube.com/@peachycloudsecurity)**
-
-### Website & Resources
-Explore more security tools and educational content:
-
-**[Visit peachycloudsecurity.com](https://peachycloudsecurity.com)**
-
-### Personal Consultations
-Book 1:1 sessions for personalized security guidance:
-
-**[Book on Topmate](https://topmate.io/peachycloudsecurity)**
+**Large repositories**: May take several minutes. Progress is shown during scanning.
 
 ## Credits
 
-This project builds upon excellent work from the security community:
+Security rules inspired by:
+- Checkov (bridgecrewio/checkov)
+- tfsec (aquasecurity/tfsec)
+- GitHub scanning functionality from sbomplay (cyfinoid/sbomplay)
 
-- **[Checkov](https://github.com/bridgecrewio/checkov)** - Comprehensive IaC security rules
-- **[tfsec](https://github.com/aquasecurity/tfsec)** - Terraform security best practices
-- **[sbomplay](https://github.com/cyfinoid/sbomplay)** - Github repo scanning functionality
+## License
 
-We didn't reinvent the wheel - this is a browser-based implementation created using lovable.dev and chatgpt to make IaC scanning accessible without CLI installations.
+GPL-3.0. See LICENSE file for details.
 
-## 📄 License
-
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
-
-**What this means:**
-- You can use, modify, and distribute this software
-- You must include the original license and copyright notice
-- If you modify and distribute, you must also use GPL-3.0 for your changes
-- Source code must be made available when you distribute the software
-
-See the [GPL-3.0 License](https://www.gnu.org/licenses/gpl-3.0.html) for full details.
-
-## ⚠️ Disclaimer
+## Disclaimer
 
 This tool is designed for security auditing and analysis of Infrastructure as Code configurations you own or have explicit permission to analyze. Always ensure you have proper authorization before scanning repositories or configurations you don't own. The authors are not responsible for any misuse of this software.
 
 This website, apps, scanner and results are provided strictly for educational purposes, independently authored and not endorsed by the author's employers or any corporate entity, provided without warranties or guarantees, with no liability accepted for misuse or misapplication.
 
-## 🔒 Peachycloud Security
+## Peachycloud Security
 
-**Hands-On Multi-Cloud & Cloud-Native Security Education**
+Hands-On Multi-Cloud & Cloud-Native Security Education
 
-Created by **The Shukla Duo (Anjali & Divyanshu)**, this tool is part of our mission to make cloud security accessible through practical, hands-on learning. We specialize in AWS, GCP, Kubernetes security, and DevSecOps practices.
+Created by The Shukla Duo (Anjali & Divyanshu), this tool is part of our mission to make cloud security accessible through practical, hands-on learning. We specialize in AWS, GCP, Kubernetes security, and DevSecOps practices.
 
-### 🎓 Learn & Grow
+### Learn & Grow
 
 Explore our educational content and training programs:
 
-**[YouTube Channel](https://www.youtube.com/@peachycloudsecurity)** | **[Website](https://peachycloudsecurity.com)** | **[1:1 Consultations](https://topmate.io/peachycloudsecurity)**
+[YouTube Channel](https://www.youtube.com/@peachycloudsecurity) | [Website](https://peachycloudsecurity.com) | [1:1 Consultations](https://topmate.io/peachycloudsecurity)
 
 Learn cloud security through hands-on labs, real-world scenarios, and practical tutorials covering GCP & AWS, GKE & EKS, Kubernetes, Containers, DevSecOps, and Threat Modeling.
 
-### 💖 Support Our Work
+### Support Our Work
 
 If this tool helps you secure your infrastructure, consider supporting our educational mission:
 
-**[Sponsor on GitHub](https://github.com/sponsors/peachycloudsecurity)**
+[Sponsor on GitHub](https://github.com/sponsors/peachycloudsecurity)
 
 Your support helps us create more free educational content and security tools for the community.
-
----
-
-* Learn Multi-Cloud & Cloud-Native Security, One Lesson at a Time.* 🛡️
-
-© 2024-2025 Peachycloud Security - The Shukla Duo

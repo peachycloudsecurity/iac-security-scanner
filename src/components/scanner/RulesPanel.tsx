@@ -44,9 +44,9 @@ export function RulesPanel({ ruleExecutions, className }: RulesPanelProps) {
       
       <CollapsibleContent>
         <div className="scanner-card mt-2 divide-y divide-border">
-          {ruleExecutions.map((execution) => (
+          {ruleExecutions.map((execution, index) => (
             <div
-              key={execution.rule.id}
+              key={`${execution.rule.id}-${index}`}
               className={cn(
                 'p-3 flex items-start gap-3',
                 execution.status === 'skipped' && 'opacity-60'

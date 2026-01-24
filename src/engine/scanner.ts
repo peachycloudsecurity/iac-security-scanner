@@ -144,11 +144,23 @@ export async function runMultiFileScan(
       const fileFindings: Finding[] = [];
       const ruleExecutions: RuleExecution[] = [];
       
+      // Debug: Log parsing results for Terraform files
+      if (fileType === 'terraform' && parsedFile.parsed) {
+        const terraformParsed = parsedFile.parsed as { blocks?: Array<{ type: string; resourceType?: string; name: string }> };
+        const resourceCount = terraformParsed.blocks?.filter(b => b.type === 'resource').length || 0;
+        const allBlocks = terraformParsed.blocks?.length || 0;
+        console.log(`[DEBUG] ${file.fileName}: Parsed ${allBlocks} total blocks, ${resourceCount} resources`, 
+          resourceCount > 0 ? terraformParsed.blocks?.filter(b => b.type === 'resource').map(b => `${b.resourceType}.${b.name}`) : 'No resources found');
+      }
+      
       // Run applicable rules
       for (const rule of ruleRegistry) {
         if (rule.applicableFileTypes.includes(fileType)) {
           try {
             const ruleFindings = rule.evaluate(parsedFile);
+            if (ruleFindings.length > 0) {
+              console.log(`[DEBUG] ${file.fileName}: Rule ${rule.id} found ${ruleFindings.length} findings`);
+            }
             fileFindings.push(...ruleFindings);
             ruleExecutions.push({
               rule,
@@ -170,6 +182,11 @@ export async function runMultiFileScan(
             reason: `Not applicable to ${fileType} files`,
           });
         }
+      }
+      
+      // Debug: Log total findings per file
+      if (fileFindings.length === 0 && fileType === 'terraform') {
+        console.log(`[DEBUG] ${file.fileName}: No findings (${ruleExecutions.filter(r => r.status === 'executed').length} rules executed)`);
       }
       
       fileResults.push({

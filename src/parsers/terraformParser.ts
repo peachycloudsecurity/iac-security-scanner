@@ -30,18 +30,40 @@ export function parseTerraform(content: string): TerraformParsed {
     }
     
     // Match block starts: resource "type" "name" {, provider "name" {, etc.
-    // More flexible matching to handle various formats
+    // More flexible matching to handle various formats (brace on same line or next line)
     const resourceMatch = line.match(/^(resource|data)\s+"([^"]+)"\s+"([^"]+)"\s*\{?\s*$/);
     const simpleBlockMatch = line.match(/^(provider|variable|output|module|terraform|locals)\s+"?([^"\s{]+)"?\s*\{?\s*$/);
     
     if (resourceMatch) {
       const [, blockType, resourceType, name] = resourceMatch;
-      const block = extractBlock(lines, i, blockType, name, resourceType);
+      // Check if opening brace is on next line
+      let startLine = i;
+      if (!line.includes('{')) {
+        // Look ahead for opening brace
+        for (let j = i + 1; j < Math.min(i + 3, lines.length); j++) {
+          if (lines[j].trim().startsWith('{')) {
+            startLine = j;
+            break;
+          }
+        }
+      }
+      const block = extractBlock(lines, startLine, blockType, name, resourceType);
       blocks.push(block);
       i = block.endLine + 1;
     } else if (simpleBlockMatch) {
       const [, blockType, name] = simpleBlockMatch;
-      const block = extractBlock(lines, i, blockType, name);
+      // Check if opening brace is on next line
+      let startLine = i;
+      if (!line.includes('{')) {
+        // Look ahead for opening brace
+        for (let j = i + 1; j < Math.min(i + 3, lines.length); j++) {
+          if (lines[j].trim().startsWith('{')) {
+            startLine = j;
+            break;
+          }
+        }
+      }
+      const block = extractBlock(lines, startLine, blockType, name);
       blocks.push(block);
       i = block.endLine + 1;
     } else {
@@ -261,15 +283,65 @@ function extractAttributes(lines: string[]): Record<string, unknown> {
         i++;
       }
     } else {
-      // Nested block detection
+      // Nested block detection - properly parse nested blocks
       const nestedMatch = line.match(/^(\w+)\s*\{/);
       if (nestedMatch) {
         const [, key] = nestedMatch;
-        if (!attrs[key]) {
-          attrs[key] = { _isBlock: true };
+        
+        // Extract the nested block content
+        let braceCount = 1;
+        let nestedEnd = i;
+        const nestedLines: string[] = [];
+        
+        // Start from the current line, extract content after the opening brace
+        const braceIndex = line.indexOf('{');
+        const currentLineContent = braceIndex !== -1 ? line.substring(braceIndex + 1) : '';
+        if (currentLineContent.trim()) {
+          nestedLines.push(currentLineContent);
         }
+        
+        // Find the closing brace for this nested block
+        for (let j = i + 1; j < lines.length; j++) {
+          const nestedLine = lines[j];
+          
+          // Count braces to find matching closing brace
+          for (const char of nestedLine) {
+            if (char === '{') braceCount++;
+            if (char === '}') braceCount--;
+          }
+          
+          // If we haven't closed yet, include the line (but trim closing brace if this is the closing line)
+          if (braceCount > 0) {
+            nestedLines.push(nestedLine);
+          } else {
+            // This is the closing line - include content before the closing brace
+            const closeBraceIndex = nestedLine.indexOf('}');
+            if (closeBraceIndex > 0) {
+              nestedLines.push(nestedLine.substring(0, closeBraceIndex));
+            }
+            nestedEnd = j;
+            break;
+          }
+        }
+        
+        // Recursively parse the nested block content
+        const nestedAttrs = extractAttributes(nestedLines);
+        
+        // Store nested attributes - if multiple blocks with same name, make it an array
+        if (attrs[key]) {
+          if (Array.isArray(attrs[key])) {
+            (attrs[key] as unknown[]).push(nestedAttrs);
+          } else {
+            attrs[key] = [attrs[key], nestedAttrs];
+          }
+        } else {
+          attrs[key] = nestedAttrs;
+        }
+        
+        i = nestedEnd + 1;
+      } else {
+        i++;
       }
-      i++;
     }
   }
   

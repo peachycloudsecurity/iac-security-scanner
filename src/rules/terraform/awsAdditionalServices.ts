@@ -128,10 +128,12 @@ export const terraformAdditionalServicesRules: Rule[] = [
       if (!parsed?.blocks) return findings;
 
       for (const block of parsed.blocks) {
-        if (block.type === 'resource' && block.resourceType === 'aws_lb_listener') {
+        if (block.type === 'resource' && 
+            (block.resourceType === 'aws_lb_listener' || block.resourceType === 'aws_alb_listener')) {
           const protocol = getAttrValue(block.attributes, 'protocol');
+          const protocolStr = typeof protocol === 'string' ? protocol.toUpperCase() : '';
           
-          if (protocol === 'HTTP') {
+          if (protocolStr === 'HTTP') {
             findings.push({
               id: `${parsedFile.fileName}-${block.name}-http-listener`,
               ruleId: this.id,
@@ -150,7 +152,7 @@ export const terraformAdditionalServicesRules: Rule[] = [
     },
   },
 
-  // AutoScaling Launch Template Encryption
+  // AutoScaling Launch Template/Configuration Encryption
   {
     id: 'TF_AWS_ASG_001',
     title: 'AutoScaling launch template enables EBS encryption',
@@ -193,6 +195,52 @@ export const terraformAdditionalServicesRules: Rule[] = [
                 }
               }
             }
+          }
+        } else if (block.type === 'resource' && block.resourceType === 'aws_launch_configuration') {
+          // Launch configurations use root_block_device and ebs_block_device
+          const rootBlockDevice = getAttrValue(block.attributes, 'root_block_device');
+          const ebsBlockDevices = getAttrValue(block.attributes, 'ebs_block_device');
+          
+          let hasUnencrypted = false;
+          
+          // Check root block device
+          if (rootBlockDevice && typeof rootBlockDevice === 'object') {
+            const rootDevice = rootBlockDevice as Record<string, unknown>;
+            const encrypted = getAttrValue(rootDevice, 'encrypted');
+            if (isFalseOrMissing(encrypted)) {
+              hasUnencrypted = true;
+            }
+          } else if (!rootBlockDevice) {
+            // If no root_block_device specified, defaults to unencrypted
+            hasUnencrypted = true;
+          }
+          
+          // Check ebs_block_device array
+          if (!hasUnencrypted && Array.isArray(ebsBlockDevices)) {
+            for (const device of ebsBlockDevices) {
+              if (typeof device === 'object' && device !== null) {
+                const deviceObj = device as Record<string, unknown>;
+                const encrypted = getAttrValue(deviceObj, 'encrypted');
+                if (isFalseOrMissing(encrypted)) {
+                  hasUnencrypted = true;
+                  break;
+                }
+              }
+            }
+          }
+          
+          if (hasUnencrypted) {
+            findings.push({
+              id: `${parsedFile.fileName}-${block.name}-unencrypted-ebs`,
+              ruleId: this.id,
+              title: this.title,
+              description: `UNENCRYPTED SCALING: Launch configuration "${block.name}" creates unencrypted EBS volumes. All AutoScaling instances store data in plaintext.`,
+              severity: this.severity,
+              fileName: parsedFile.fileName,
+              resourcePath: `aws_launch_configuration.${block.name}`,
+              lineNumber: block.startLine,
+              remediation: 'Set root_block_device { encrypted = true } and ebs_block_device { encrypted = true } to encrypt all volumes. Use kms_key_id for customer managed keys.',
+            });
           }
         }
       }

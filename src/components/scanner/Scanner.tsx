@@ -14,7 +14,7 @@ import { FindingsTable } from './FindingsTable';
 import { RulesPanel } from './RulesPanel';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Play, FileDown, RotateCcw, Upload, Code, BookOpen, Moon, Sun, Calendar, Coffee, ExternalLink, Youtube, Github, Loader2, FileCode, ChevronDown, Lock, Heart } from 'lucide-react';
+import { Shield, Play, FileDown, RotateCcw, Upload, Code, BookOpen, Moon, Sun, Calendar, Coffee, ExternalLink, Youtube, Github, Loader2, FileCode, ChevronDown, ChevronUp, Lock, Heart } from 'lucide-react';
 import { validateGitHubUrl, fetchGitHubRepoFiles, setRateLimitHandler, RateLimitHandler } from '@/utils/githubClient';
 import { runMultiFileScan } from '@/engine/scanner';
 import { MultiFileScanResult } from '@/types/scanner';
@@ -44,6 +44,7 @@ export function Scanner() {
   const [githubStatus, setGithubStatus] = useState<string | null>(null);
   const [githubUrl, setGithubUrl] = useState<string>('');
   const [rateLimitDialog, setRateLimitDialog] = useState<{ open: boolean; resetTime: Date; waitMinutes: number; resolve: (value: boolean) => void } | null>(null);
+  const [filesScannedExpanded, setFilesScannedExpanded] = useState(false);
   
   useEffect(() => {
     // Initialize theme from localStorage or default to dark
@@ -526,9 +527,71 @@ export function Scanner() {
           {/* Aggregate all findings from all files - Same format as single file */}
             {(() => {
               const allFindings = multiFileResult.files.flatMap(f => f.findings);
+              const filesWithFindings = multiFileResult.files.filter(f => f.findings.length > 0);
+              const filesWithoutFindings = multiFileResult.files.filter(f => f.findings.length === 0 && !f.error);
+              
               return (
                 <>
                   <ScanSummary findings={allFindings} />
+                  
+                  {/* Per-file breakdown */}
+                  {multiFileResult.files.length > 1 && (
+                    <div className="scanner-card p-4">
+                      <button
+                        onClick={() => setFilesScannedExpanded(!filesScannedExpanded)}
+                        className="w-full flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors cursor-pointer py-1 mb-2"
+                      >
+                        {filesScannedExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                        <span>Files Scanned: {multiFileResult.files.length} files</span>
+                      </button>
+                      {filesScannedExpanded && (
+                        <div className="max-h-96 overflow-y-scroll border border-border rounded-md p-3 bg-muted/20">
+                          <div className="space-y-3 text-sm">
+                            {filesWithFindings.length > 0 && (
+                              <div>
+                                <span className="font-medium text-foreground">Files with findings ({filesWithFindings.length}):</span>
+                                <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+                                  {filesWithFindings.map(f => (
+                                    <li key={f.fileName} className="text-muted-foreground">
+                                      {f.fileName} - {f.findings.length} finding{f.findings.length !== 1 ? 's' : ''}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {filesWithoutFindings.length > 0 && (
+                              <div>
+                                <span className="font-medium text-foreground">Files without findings ({filesWithoutFindings.length}):</span>
+                                <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+                                  {filesWithoutFindings.map(f => (
+                                    <li key={f.fileName} className="text-muted-foreground">
+                                      {f.fileName}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {multiFileResult.files.filter(f => f.error).length > 0 && (
+                              <div>
+                                <span className="font-medium text-destructive">Files with errors ({multiFileResult.files.filter(f => f.error).length}):</span>
+                                <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+                                  {multiFileResult.files.filter(f => f.error).map(f => (
+                                    <li key={f.fileName} className="text-destructive">
+                                      {f.fileName}: {f.error}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {allFindings.length > 0 && (
                     <FindingsTable findings={allFindings} />
