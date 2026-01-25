@@ -272,15 +272,16 @@ export function Scanner() {
                 <div className="hidden sm:block">
                   <h1 className="text-xl font-bold text-foreground">CloudGuard</h1>
                   <p className="text-xs text-muted-foreground">IaC Security Scanner v{APP_VERSION}</p>
+                  <p className="text-xs text-muted-foreground/70">by Peachycloud Security</p>
                 </div>
               </div>
               
               {/* Nav Links */}
               <nav className="hidden md:flex items-center gap-4">
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://peachycloudsecurity.com" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Home
                 </a>
-                <a href="#about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="https://peachycloudsecurity.com/about" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   About
                 </a>
               </nav>
@@ -311,9 +312,22 @@ export function Scanner() {
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
               
+              {/* YouTube Follow */}
+              <a
+                href="https://www.youtube.com/@peachycloudsecurity"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex"
+              >
+                <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-red-500">
+                  <Youtube className="w-4 h-4" />
+                  <span className="hidden lg:inline">Follow</span>
+                </Button>
+              </a>
+              
               {/* Book a Session */}
               <a
-                href="https://calendly.com"
+                href="https://topmate.io/peachycloudsecurity"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden sm:inline-flex"
@@ -326,11 +340,11 @@ export function Scanner() {
               
               {/* Buy Me a Coffee */}
               <a
-                href="https://buymeacoffee.com"
+                href="https://github.com/sponsors/peachycloudsecurity"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-amber-500" title="Buy Me a Coffee">
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-amber-500" title="Sponsor on GitHub">
                   <Coffee className="w-4 h-4" />
                 </Button>
               </a>
@@ -637,9 +651,16 @@ export function Scanner() {
                   Subscribe
                 </Button>
               </a>
-              <Button variant="secondary" size="sm" className="gap-2" disabled>
-                Join Waitlist
-              </Button>
+              <a
+                href="https://peachycloudsecurity.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="secondary" size="sm" className="gap-2">
+                  <ExternalLink className="w-4 h-4" />
+                  Visit Website
+                </Button>
+              </a>
             </div>
           </div>
         </div>
@@ -651,11 +672,13 @@ export function Scanner() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Footer Links */}
             <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                Resources
-              </a>
-              <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
-                About
+              <a
+                href="https://peachycloudsecurity.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Website
               </a>
               <a
                 href="https://github.com/peachycloudsecurity/iac-security-scanner"
@@ -666,25 +689,51 @@ export function Scanner() {
                 <Github className="w-4 h-4" />
                 GitHub
               </a>
+              <a
+                href="https://topmate.io/peachycloudsecurity"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
+              >
+                <Calendar className="w-4 h-4" />
+                Consultations
+              </a>
             </div>
             
-            {/* Branding / YouTube Link */}
-            <a
-              href="https://www.youtube.com/@peachycloudsecurity"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
-            >
-              <Youtube className="w-3 h-3" />
-              Learn more at Peachy Cloud Security
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            {/* Branding Links */}
+            <div className="flex items-center gap-4 text-xs">
+              <a
+                href="https://peachycloudsecurity.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground/70 hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
+              >
+                Peachy Cloud Security
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <a
+                href="https://topmate.io/peachycloudsecurity"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground/70 hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
+              >
+                <Calendar className="w-3 h-3" />
+                1:1 Consultations
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
           </div>
           
           {/* Bottom Line */}
-          <div className="mt-4 pt-4 border-t border-border/50 text-center">
+          <div className="mt-4 pt-4 border-t border-border/50 text-center space-y-2">
             <p className="text-xs text-muted-foreground">
               CloudGuard Scanner • 100% Client-Side • No Data Leaves Your Browser
+            </p>
+            <p className="text-xs text-muted-foreground/70">
+              Created by <span className="font-medium text-foreground">The Shukla Duo (Anjali & Divyanshu)</span> • 
+              <a href="https://peachycloudsecurity.com" target="_blank" rel="noopener noreferrer" className="ml-1 hover:text-foreground transition-colors">
+                Peachycloud Security
+              </a>
             </p>
           </div>
         </div>
@@ -728,12 +777,26 @@ export function Scanner() {
             security professionals learning cloud security the practical way.
           </p>
           <p className="text-base sm:text-lg font-semibold text-primary mb-3 sm:mb-4">@peachycloudsecurity</p>
-          <a href="https://www.youtube.com/@peachycloudsecurity" target="_blank" rel="noopener noreferrer">
-            <Button size="lg" className="gap-2 bg-red-600 hover:bg-red-700 text-white border-0">
-              <Youtube className="h-5 w-5" />
-              Subscribe on YouTube
-            </Button>
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
+            <a href="https://peachycloudsecurity.com" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="gap-2">
+                <ExternalLink className="h-5 w-5" />
+                Visit Website
+              </Button>
+            </a>
+            <a href="https://www.youtube.com/@peachycloudsecurity" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" className="gap-2 bg-red-600 hover:bg-red-700 text-white border-0">
+                <Youtube className="h-5 w-5" />
+                Subscribe on YouTube
+              </Button>
+            </a>
+            <a href="https://topmate.io/peachycloudsecurity" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="gap-2">
+                <Calendar className="h-5 w-5" />
+                1:1 Consultations
+              </Button>
+            </a>
+          </div>
           <div className="mt-4">
             <a
               href="https://github.com/sponsors/peachycloudsecurity"
