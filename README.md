@@ -4,7 +4,7 @@ Browser-based Infrastructure as Code security scanner. Analyzes Terraform, Kuber
 
 ## Features
 
-- 2448 security rules covering common misconfigurations
+- 150+ security rules covering common misconfigurations
 - Supports Terraform, Kubernetes, Docker, CloudFormation
 - GitHub repository scanning with rate limit handling
 - PDF report export
