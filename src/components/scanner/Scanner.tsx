@@ -86,19 +86,22 @@ export function Scanner() {
     setFileName(name);
     setCode(content);
     setScanResult(null);
+    setMultiFileResult(null);
     setScanState('idle');
   }, []);
   
   const handleCodeChange = useCallback((value: string) => {
     setCode(value);
     setScanResult(null);
+    setMultiFileResult(null);
     setScanState('idle');
   }, []);
-
+  
   const handleExampleSelect = useCallback((example: Example) => {
     setFileName(example.fileName);
     setCode(example.content);
     setScanResult(null);
+    setMultiFileResult(null);
     setScanState('idle');
     // Switch to paste tab to show the selected example
     setInputMethod('paste');
