@@ -51,8 +51,13 @@ export function Scanner() {
     const savedTheme = localStorage.getItem('cloudguard-theme');
     const prefersDark = savedTheme === 'dark' || (!savedTheme && true);
     setIsDarkMode(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
-    
+
+    if (prefersDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     // Set up rate limit handler
     const rateLimitHandler: RateLimitHandler = async (resetTime, waitMinutes) => {
       return new Promise((resolve) => {
@@ -64,19 +69,25 @@ export function Scanner() {
         });
       });
     };
-    
+
     setRateLimitHandler(rateLimitHandler);
-    
+
     // Cleanup on unmount
     return () => {
       setRateLimitHandler(null);
     };
   }, []);
-  
+
   const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    document.documentElement.classList.toggle('dark', newMode);
+
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     localStorage.setItem('cloudguard-theme', newMode ? 'dark' : 'light');
   };
   

@@ -4,7 +4,7 @@ Browser-based Infrastructure as Code security scanner. Analyzes Terraform, Kuber
 
 ## Features
 
-- 150+ security rules covering common misconfigurations
+- 180+ security rules covering common misconfigurations
 - Supports Terraform, Kubernetes, Docker, CloudFormation
 - GitHub repository scanning with rate limit handling
 - PDF report export
@@ -71,7 +71,7 @@ Scan public GitHub repositories by entering the repository URL. The scanner hand
 ```
 src/
 ├── components/     # React components
-├── rules/          # 2448 security rules by IaC type
+├── rules/          # 180+ security rules by IaC type
 ├── parsers/        # File parsers for each format
 ├── engine/         # Core scanning logic
 └── utils/          # GitHub client, PDF export, etc.

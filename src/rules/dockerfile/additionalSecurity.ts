@@ -45,7 +45,7 @@ export const dockerfileAdditionalSecurityRules: Rule[] = [
 
   // Exposed Ports
   {
-    id: 'DOCKER_NET_001',
+    id: 'DOCKER_DOC_001',
     title: 'Dockerfile documents exposed ports',
     description: 'MISSING PORT DOCUMENTATION: No EXPOSE instruction. Makes it unclear which ports the container listens on, complicating security reviews and network policies.',
     severity: 'MEDIUM',

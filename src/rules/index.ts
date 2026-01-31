@@ -11,6 +11,11 @@ import { terraformAwsLoggingRules } from './terraform/awsLogging';
 import { terraformAwsBackupRules } from './terraform/awsBackup';
 import { terraformSecretScanningRules } from './terraform/secretScanning';
 import { terraformLowSeverityRules } from './terraform/lowSeverityRules';
+import { terraformAwsMessagingRules } from './terraform/awsMessaging';
+import { terraformAwsApiGatewayRules } from './terraform/awsApiGateway';
+import { terraformAwsStepFunctionsRules } from './terraform/awsStepFunctions';
+import { terraformAwsEKSRules } from './terraform/awsEKS';
+import { terraformAwsECRRules } from './terraform/awsECR';
 import { kubernetesRunAsRootRule } from './kubernetes/runAsRoot';
 import { kubernetesSecurityContextRules } from './kubernetes/securityContext';
 import { kubernetesSecretsRule } from './kubernetes/secrets';
@@ -48,7 +53,12 @@ export const ruleRegistry: Rule[] = [
   ...terraformAwsBackupRules,
   ...terraformSecretScanningRules,
   ...terraformLowSeverityRules,
-  
+  ...terraformAwsMessagingRules,
+  ...terraformAwsApiGatewayRules,
+  ...terraformAwsStepFunctionsRules,
+  ...terraformAwsEKSRules,
+  ...terraformAwsECRRules,
+
   // Kubernetes rules
   kubernetesRunAsRootRule,
   ...kubernetesSecurityContextRules,

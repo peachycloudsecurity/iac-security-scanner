@@ -1,49 +1,7 @@
 import { Rule } from '@/types/scanner';
 
 export const kubernetesLowSeverityRules: Rule[] = [
-  {
-    id: 'K8S_IMG_001',
-    title: 'Container should not use latest tag',
-    description: 'VERSION CONTROL: Container uses "latest" tag which can lead to unpredictable deployments and security issues.',
-    severity: 'LOW',
-    applicableFileTypes: ['kubernetes'],
-    evaluate: (parsedFile) => {
-      const findings = [];
-      const resources = Array.isArray(parsedFile) ? parsedFile : [parsedFile];
-      
-      for (const resource of resources) {
-        if (!resource || typeof resource !== 'object') continue;
-        
-        const kind = resource.kind;
-        if (!['Deployment', 'StatefulSet', 'DaemonSet', 'Job', 'CronJob', 'Pod'].includes(kind)) continue;
-        
-        let containers = [];
-        if (kind === 'Pod') {
-          containers = resource.spec?.containers || [];
-        } else if (kind === 'CronJob') {
-          containers = resource.spec?.jobTemplate?.spec?.template?.spec?.containers || [];
-        } else {
-          containers = resource.spec?.template?.spec?.containers || [];
-        }
-        
-        for (const container of containers) {
-          const image = container.image || '';
-          if (image.endsWith(':latest') || (!image.includes(':') && image !== '')) {
-            findings.push({
-              ruleId: 'K8S_IMG_001',
-              title: 'Container should not use latest tag',
-              description: `VERSION CONTROL: Container "${container.name}" uses "latest" tag or no tag (defaults to latest). This can lead to unpredictable deployments and potential security vulnerabilities.`,
-              severity: 'LOW',
-              resourcePath: `${kind}/${resource.metadata?.name}/containers/${container.name}`,
-              remediation: 'Use specific image tags: image: "nginx:1.21.6" instead of "nginx:latest" or "nginx"'
-            });
-          }
-        }
-      }
-      
-      return findings;
-    }
-  },
+  // K8S_IMG_001 removed - duplicate of rule in imageSecurity.ts with correct MEDIUM severity
 
   {
     id: 'K8S_PROBE_001',
