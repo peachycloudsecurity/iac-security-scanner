@@ -156,7 +156,7 @@ export function Scanner() {
         return;
       }
 
-      const { owner, repo } = validation.info;
+      const { owner, repo, defaultBranch } = validation.info;
 
       // Fetch files
       setScanState('parsing');
@@ -164,7 +164,7 @@ export function Scanner() {
       const { files } = await fetchGitHubRepoFiles(
         owner, 
         repo, 
-        undefined, 
+        defaultBranch, 
         (current, total, currentFile) => {
           setGithubProgress({ current, total, file: currentFile });
         },
@@ -440,7 +440,7 @@ export function Scanner() {
 
             <TabsContent value="github">
               <GitHubInput onScan={handleGitHubScan} isScanning={isScanning} />
-              {githubProgress && (
+              {(scanState === 'parsing' || scanState === 'scanning') && githubProgress && (
                 <div className="mt-4 p-4 bg-muted/30 rounded-lg border border-border space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
